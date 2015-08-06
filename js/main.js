@@ -4,11 +4,19 @@ clonq_revo_config_ui = {
 		setTimeout(function(){
 			var pageTags = generatePage(config.template);
 			$('.settings').append(pageTags);
+			$('.add-btn').click(function(){
+				//todo
+				// var data = [];
+				// Object.keys(config.template).forEach(function(key){
+
+				// });
+				// alert(JSON.stringify(config.template, null, 4));
+			})
 		}, 100);
 	}
 }
 
-function generateEntry(pair) {
+function generateEntry(section, pair) {
 	var row = $('<div class="row"/>');
 	var leftCol = $('<div class="col-xs-3"/>');
 	var rightCol = $('<div class="col-xs-9"/>');
@@ -41,7 +49,7 @@ function generateEntry(pair) {
 		leftCol.append(label);
 		row.append(leftCol);
 		var isMultivalue = !!value && !hasSubfields && value.split(' ').length > 1;
-		var inputEl = $('<input/>');
+		var inputEl = $('<input id="'+section+'['+key+']"/>');
 		if(isMultivalue) {
 			inputEl = $('<select/>');
 			value.split(' ').forEach(function(val){
@@ -66,7 +74,7 @@ function generateSection(template, section) {
 		return ret;
 	});
 	fieldPairs.forEach(function(pair){
-		var entry = generateEntry(pair);
+		var entry = generateEntry(section, pair);
 		sectionEl.append(entry);
 	})
 	return sectionEl;
@@ -79,53 +87,11 @@ function generatePage(template) {
 		var sectionEl = generateSection(template, section);
 		ret.push(sectionEl);
 	});
+	var row = $('<div class="row"/>');
+	var col = $('<div class="col-xs-12"/>');
+	var addBtn = $(['<hr/>', '<button class="btn btn-primary add-btn">', 'Add', '</button>'].join(''));
+	col.append(addBtn);
+	row.append(col);
+	ret.push(row);
 	return ret;
 }
-/*
-function generateForm(fieldList) {
-	console.log(fieldList)
-	var form = $('<form/>');
-	Object.keys(fieldList).forEach(function(fieldName){
-		var row = $('<div class="row"/>');
-		var fieldValue = fieldList[fieldName];
-		var label = $('<label/>')
-		label.html(fieldName);
-		var field;
-		var col1 = $('<div class="col-md-3"/>');
-
-		if(fieldValue) {
-			var fieldset = $('<fieldset/>');
-			if(typeof(fieldValue) === 'object') {
-				var row = $('<div class="row"/>');
-				if(!!label) {
-					var legend = $('<legend/>');
-					legend.html(label);
-					fieldset.append(legend);
-				}
-				var subform = generateForm(fieldValue)
-				fieldset.append(subform);
-			} else if(typeof(fieldValue) === 'string') {
-				if(fieldValue.split(' ').length > 1) {
-					field = $('<select/>');
-					fieldValue.split(' ').forEach(function(val){
-						var option = $('<option/>');
-						option.html(val);
-						field.append(option);
-					});
-				}
-			}
-			row.append(fieldset);
-			form.append(row);
-		} else {
-			field = $('<input/>');
-			if(!!label) col1.append(label);
-		}
-		var col2 = $('<div class="col-md-9"/>');
-		if(!!field) col2.append(field);
-		row.append(col1);
-		row.append(col2);
-		form.append(row);
-	});
-	return form;
-}
-*/
