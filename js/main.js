@@ -5,12 +5,17 @@ clonq_revo_config_ui = {
 			var pageTags = generatePage(config.template);
 			$('.settings').append(pageTags);
 			$('.add-btn').click(function(){
-				//todo
-				// var data = [];
-				// Object.keys(config.template).forEach(function(key){
-
-				// });
-				// alert(JSON.stringify(config.template, null, 4));
+				var data = [];
+				//todo: count all sections and finish implementation
+				var sectionData = config.template;
+				Object.keys(config.template).forEach(function(section){
+					var fields = Object.keys(config.template[section]);
+					fields.forEach(function(field){
+						var inputId = [section, '_', field].join('');
+						sectionData[section][field] = $('#'+inputId).val()
+					})
+				});
+				alert(JSON.stringify(sectionData, null, 4));
 			})
 		}, 100);
 	}
@@ -49,7 +54,7 @@ function generateEntry(section, pair) {
 		leftCol.append(label);
 		row.append(leftCol);
 		var isMultivalue = !!value && !hasSubfields && value.split(' ').length > 1;
-		var inputEl = $('<input id="'+section+'['+key+']"/>');
+		var inputEl = $('<input id="'+section+'_'+key+'"/>');
 		if(isMultivalue) {
 			inputEl = $('<select/>');
 			value.split(' ').forEach(function(val){
