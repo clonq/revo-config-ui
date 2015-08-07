@@ -21,58 +21,97 @@ clonq_revo_config_ui = {
 	}
 }
 
+function addPair(parent, section, key, value) {
+	var hasSubfields = !!value && typeof(value) === 'object';
+	var label = $(['<label>', key, '</label>'].join(''));
+	parent.append(label);
+	var isMultivalue = !!value && !hasSubfields && value.split(' ').length > 1;
+	var field = $('<input class="form-control" id="'+section+'_'+key+'"/>');
+	if(isMultivalue) {
+		field = $('<select class="form-control"/>');
+		value.split(' ').forEach(function(val){
+			var option = $('<option/>');
+			option.html(val);
+			field.append(option);
+		});
+	}
+	parent.append(field);
+}
 function generateEntry(section, pair) {
-	var row = $('<div class="row"/>');
-	var leftCol = $('<div class="col-xs-3"/>');
-	var rightCol = $('<div class="col-xs-9"/>');
+	var group = $('<div class="form-group"/>');
 	var key = Object.keys(pair)[0];
 	var value = pair[key];
 	var hasSubfields = !!value && typeof(value) === 'object';
 	if(hasSubfields) {
-		var label = $(['<label>', key, '</label>'].join(''));
-		leftCol.append(label);
-		row.append(leftCol);
+		var well = $('<div class="well form-group"/>');
+		var label = $(['<label>', key, '</label><br/><br/>'].join(''));
+		well.append(label);
 		Object.keys(value).forEach(function(key){
-			var subrow = $('<div class="row"/>');
-			var rightLeftCol = $('<div class="col-xs-3"/>');
-			var rightRightCol = $('<div class="col-xs-9"/>');
-			var label = $(['<label>', key, '</label>'].join(''));
 			var value = pair[key];
-			var isMultivalue = !!value && !hasSubfields && value.split(' ').length > 1;
-			var inputEl = $('<input/>');
-			if(isMultivalue) {
-			}
-			rightLeftCol.append(label);
-			rightRightCol.append(inputEl);
-			subrow.append(rightLeftCol);
-			subrow.append(rightRightCol);
-			rightCol.append(subrow);
-		})
-		row.append(rightCol);
+			addPair(well, section, key, value);
+		});
+		group.append(well);
 	} else {
-		var label = $(['<label>', key, '</label>'].join(''));
-		leftCol.append(label);
-		row.append(leftCol);
-		var isMultivalue = !!value && !hasSubfields && value.split(' ').length > 1;
-		var inputEl = $('<input id="'+section+'_'+key+'"/>');
-		if(isMultivalue) {
-			inputEl = $('<select/>');
-			value.split(' ').forEach(function(val){
-				var option = $('<option/>');
-				option.html(val);
-				inputEl.append(option);
-			});
-		}
-		rightCol.append(inputEl);
-		row.append(rightCol);
+		addPair(group, section, key, value);
 	}
-	return row;
+	return group;
 }
 
+
+// function generateEntry(section, pair) {
+// 	// var row = $('<div class="row"/>');
+// 	var row = $('<div class="form-group"/>');
+// 	var leftCol = $('<div class="col-xs-3"/>');
+// 	var rightCol = $('<div class="col-xs-3"/>');
+// 	var key = Object.keys(pair)[0];
+// 	var value = pair[key];
+// 	var hasSubfields = !!value && typeof(value) === 'object';
+// 	if(hasSubfields) {
+// 		var label = $(['<label>', key, '</label>'].join(''));
+// 		leftCol.append(label);
+// 		row.append(leftCol);
+// 		Object.keys(value).forEach(function(key){
+// 			var subrow = $('<div class="row"/>');
+// 			var rightLeftCol = $('<div class="col-xs-3"/>');
+// 			var rightRightCol = $('<div class="col-xs-9"/>');
+// 			var label = $(['<label>', key, '</label>'].join(''));
+// 			var value = pair[key];
+// 			var isMultivalue = !!value && !hasSubfields && value.split(' ').length > 1;
+// 			var inputEl = $('<input class="form-control"/>');
+// 			if(isMultivalue) {
+// 			}
+// 			rightLeftCol.append(label);
+// 			rightRightCol.append(inputEl);
+// 			subrow.append(rightLeftCol);
+// 			subrow.append(rightRightCol);
+// 			rightCol.append(subrow);
+// 		})
+// 		row.append(rightCol);
+// 	} else {
+// 		var label = $(['<label>', key, '</label>'].join(''));
+// 		leftCol.append(label);
+// 		row.append(leftCol);
+// 		var isMultivalue = !!value && !hasSubfields && value.split(' ').length > 1;
+// 		var inputEl = $('<input class="form-control" id="'+section+'_'+key+'"/>');
+// 		if(isMultivalue) {
+// 			inputEl = $('<select class="form-control"/>');
+// 			value.split(' ').forEach(function(val){
+// 				var option = $('<option/>');
+// 				option.html(val);
+// 				inputEl.append(option);
+// 			});
+// 		}
+// 		rightCol.append(inputEl);
+// 		row.append(rightCol);
+// 	}
+// 	return row;
+// }
+
 function generateSection(template, section) {
-	var sectionEl = $('<fieldset/>');
-	var sectionTitleEl = $(['<legend>',section,'</legend>'].join(''));
-	sectionEl.append(sectionTitleEl);
+	var panel = $('<div class="panel panel-primary">');
+	var panelHeader = $(['<div class="panel-heading">',section,'</div>'].join(''));
+	panel.append(panelHeader);
+	var panelBody = $('<div class="panel-body">');
 	var fieldPairs = Object.keys(template[section]).map(function(key){
 		var ret = {};
 		ret[key] = template[section][key];
@@ -80,9 +119,10 @@ function generateSection(template, section) {
 	});
 	fieldPairs.forEach(function(pair){
 		var entry = generateEntry(section, pair);
-		sectionEl.append(entry);
+		panelBody.append(entry);
 	})
-	return sectionEl;
+	panel.append(panelBody);
+	return panel;
 }
 
 function generatePage(template) {
@@ -94,7 +134,7 @@ function generatePage(template) {
 	});
 	var row = $('<div class="row"/>');
 	var col = $('<div class="col-xs-12"/>');
-	var addBtn = $(['<hr/>', '<button class="btn btn-primary add-btn">', 'Add', '</button>'].join(''));
+	var addBtn = $(['<button class="btn btn-success add-btn" style="width:100%">', 'Add', '</button>'].join(''));
 	col.append(addBtn);
 	row.append(col);
 	ret.push(row);
