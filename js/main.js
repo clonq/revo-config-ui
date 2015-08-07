@@ -57,56 +57,6 @@ function generateEntry(section, pair) {
 	return group;
 }
 
-
-// function generateEntry(section, pair) {
-// 	// var row = $('<div class="row"/>');
-// 	var row = $('<div class="form-group"/>');
-// 	var leftCol = $('<div class="col-xs-3"/>');
-// 	var rightCol = $('<div class="col-xs-3"/>');
-// 	var key = Object.keys(pair)[0];
-// 	var value = pair[key];
-// 	var hasSubfields = !!value && typeof(value) === 'object';
-// 	if(hasSubfields) {
-// 		var label = $(['<label>', key, '</label>'].join(''));
-// 		leftCol.append(label);
-// 		row.append(leftCol);
-// 		Object.keys(value).forEach(function(key){
-// 			var subrow = $('<div class="row"/>');
-// 			var rightLeftCol = $('<div class="col-xs-3"/>');
-// 			var rightRightCol = $('<div class="col-xs-9"/>');
-// 			var label = $(['<label>', key, '</label>'].join(''));
-// 			var value = pair[key];
-// 			var isMultivalue = !!value && !hasSubfields && value.split(' ').length > 1;
-// 			var inputEl = $('<input class="form-control"/>');
-// 			if(isMultivalue) {
-// 			}
-// 			rightLeftCol.append(label);
-// 			rightRightCol.append(inputEl);
-// 			subrow.append(rightLeftCol);
-// 			subrow.append(rightRightCol);
-// 			rightCol.append(subrow);
-// 		})
-// 		row.append(rightCol);
-// 	} else {
-// 		var label = $(['<label>', key, '</label>'].join(''));
-// 		leftCol.append(label);
-// 		row.append(leftCol);
-// 		var isMultivalue = !!value && !hasSubfields && value.split(' ').length > 1;
-// 		var inputEl = $('<input class="form-control" id="'+section+'_'+key+'"/>');
-// 		if(isMultivalue) {
-// 			inputEl = $('<select class="form-control"/>');
-// 			value.split(' ').forEach(function(val){
-// 				var option = $('<option/>');
-// 				option.html(val);
-// 				inputEl.append(option);
-// 			});
-// 		}
-// 		rightCol.append(inputEl);
-// 		row.append(rightCol);
-// 	}
-// 	return row;
-// }
-
 function generateSection(template, section) {
 	var panel = $('<div class="panel panel-primary">');
 	var panelHeader = $(['<div class="panel-heading">',section,'</div>'].join(''));
