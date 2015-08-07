@@ -6,7 +6,6 @@ clonq_revo_config_ui = {
 			$('.settings').append(pageTags);
 			$('.add-btn').click(function(){
 				var data = [];
-				//todo: count all sections and finish implementation
 				var sectionData = config.template;
 				Object.keys(config.template).forEach(function(section){
 					var fields = Object.keys(config.template[section]);
@@ -24,10 +23,40 @@ clonq_revo_config_ui = {
 						}
 					});
 				});
-				alert(JSON.stringify(sectionData, null, 4));
+				var route = generateListEntry(sectionData);
+				$('.list').append(route);
 			})
 		}, 100);
 	}
+}
+
+function generateListEntry(data) {
+	var ret = [];
+	var well = $('<div class="well"/>');
+	Object.keys(data).forEach(function(section){
+		var sectionEl = $('<blockquote/>');
+		var title = $(['<p>', section, '</p>'].join(''));
+		sectionEl.append(title);
+		var footer = $('<footer/>');
+		var fields = Object.keys(data[section]);
+		fields.forEach(function(name){
+			var value = data[section][name];
+			var hasSubfields = !!value && (typeof(value) === 'object');
+			if(hasSubfields) {
+				var subfields = Object.keys(value);
+				//todo: add group name & subfields
+				subfields.forEach(function(subfield){
+				});
+			} else {
+				var entry = $(['<div>', name, ': ', value, '</div>'].join(''));
+				footer.append(entry);
+			}
+		});
+		sectionEl.append(footer);
+		well.append(sectionEl);
+	});
+	ret.push(well);		
+	return ret;
 }
 
 function addPair(parent, section, key, label, value) {
