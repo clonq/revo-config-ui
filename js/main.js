@@ -2,14 +2,22 @@ clonq_revo_config_ui = {
 	init: function(config){
 		//todo: figure out the race condition and remove setTimeout
 		setTimeout(function(){
-			var pageTags = generatePage(config.template);
-			$('.settings').append(pageTags);
-			$('.add-btn').click(function(){
-				var sectionData = captureSectionData(config);
-				var settingsEntry = generateListEntry(sectionData);
-				revo.emit({ action:'update', model:'config', data:sectionData });
-				//todo: populate list based on config.update.response data
-				// $('.list').append(settingsEntry);
+			$('#revo-config-ui .title').html(config.title);
+			config.components.forEach(function(component){
+				// var pill = $('<li><a href="#">'+component.label+'</a></li>');
+				// var menuItem = $('<button type="button" class="btn btn-default navbar-btn">'+component.label+'</button>');
+				var menuItem = $('<li role="presentation" class="active"><a href="#">'+component.label+'</a></li>');
+				$('#revo-config-ui .nav').append(menuItem);
+				var pageTags = generatePage(component.template);
+				$('#revo-config-ui .settings').append(pageTags);
+				$('#revo-config-ui .add-btn').click(function(){
+					var sectionData = captureSectionData(component);
+					var settingsEntry = generateListEntry(sectionData);
+					revo.emit({ action:'update', model:'config', data:sectionData });
+					//todo: populate list based on config.update.response data
+					$('.list').append(settingsEntry);
+				})
+
 			})
 		}, 100);
 	}
