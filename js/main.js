@@ -19,7 +19,7 @@ clonq_revo_config_ui = {
 							});
 						} else {
 							var inputId = [section, '_', field].join('');
-							sectionData[section][field] = $('#'+inputId).val()
+							sectionData[section][field] = $('#'+inputId).val();
 						}
 					});
 				});
@@ -43,9 +43,13 @@ function generateListEntry(data) {
 			var value = data[section][name];
 			var hasSubfields = !!value && (typeof(value) === 'object');
 			if(hasSubfields) {
+				var entry = $(['<div>', name, ': ', '</div>'].join(''));
+				footer.append(entry);
 				var subfields = Object.keys(value);
-				//todo: add group name & subfields
 				subfields.forEach(function(subfield){
+					var value = data[section][name][subfield];
+					var subentry = $(['<div>', '&nbsp;&nbsp;&nbsp;&nbsp;', subfield, ': ', value, '</div>'].join(''));
+					footer.append(subentry);
 				});
 			} else {
 				var entry = $(['<div>', name, ': ', value, '</div>'].join(''));
