@@ -4,8 +4,6 @@ clonq_revo_config_ui = {
 		setTimeout(function(){
 			$('#revo-config-ui .title').html(config.title);
 			config.components.forEach(function(component){
-				// var pill = $('<li><a href="#">'+component.label+'</a></li>');
-				// var menuItem = $('<button type="button" class="btn btn-default navbar-btn">'+component.label+'</button>');
 				var menuItem = $('<li role="presentation" class="active"><a href="#">'+component.label+'</a></li>');
 				$('#revo-config-ui .nav').append(menuItem);
 				var pageTags = generatePage(component.template);
@@ -13,7 +11,10 @@ clonq_revo_config_ui = {
 				$('#revo-config-ui .add-btn').click(function(){
 					var sectionData = captureSectionData(component);
 					var settingsEntry = generateListEntry(sectionData);
-					revo.emit({ action:'update', model:'config', data:sectionData });
+					var configData = {};
+					configData[component.name] = {};
+					configData[component.name][component.key] = sectionData
+					revo.emit({ action:'push', model:'config', data:configData });
 					//todo: populate list based on config.update.response data
 					$('.list').append(settingsEntry);
 				})
