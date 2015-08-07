@@ -5,29 +5,35 @@ clonq_revo_config_ui = {
 			var pageTags = generatePage(config.template);
 			$('.settings').append(pageTags);
 			$('.add-btn').click(function(){
-				var data = [];
-				var sectionData = config.template;
-				Object.keys(config.template).forEach(function(section){
-					var fields = Object.keys(config.template[section]);
-					fields.forEach(function(field){
-						var hasSubfields = !!config.template[section][field] && (typeof(config.template[section][field]) === 'object');
-						if(hasSubfields) {
-							var subfields = Object.keys(config.template[section][field]);
-							subfields.forEach(function(subfield){
-								var inputId = [section, '_', field, '_', subfield].join('');
-								sectionData[section][field][subfield] = $('#'+inputId).val();
-							});
-						} else {
-							var inputId = [section, '_', field].join('');
-							sectionData[section][field] = $('#'+inputId).val();
-						}
-					});
-				});
-				var route = generateListEntry(sectionData);
-				$('.list').append(route);
+				var sectionData = captureSectionData(config);
+				var settingsEntry = generateListEntry(sectionData);
+				revo.emit({ action:'update', model:'config', data:sectionData });
+				//todo: populate list based on config.update.response data
+				// $('.list').append(settingsEntry);
 			})
 		}, 100);
 	}
+}
+
+function captureSectionData(config) {
+	var sectionData = config.template;
+	Object.keys(config.template).forEach(function(section){
+		var fields = Object.keys(config.template[section]);
+		fields.forEach(function(field){
+			var hasSubfields = !!config.template[section][field] && (typeof(config.template[section][field]) === 'object');
+			if(hasSubfields) {
+				var subfields = Object.keys(config.template[section][field]);
+				subfields.forEach(function(subfield){
+					var inputId = [section, '_', field, '_', subfield].join('');
+					sectionData[section][field][subfield] = $('#'+inputId).val();
+				});
+			} else {
+				var inputId = [section, '_', field].join('');
+				sectionData[section][field] = $('#'+inputId).val();
+			}
+		});
+	});
+	return sectionData;
 }
 
 function generateListEntry(data) {
