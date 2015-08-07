@@ -12,11 +12,18 @@ Generate simple config screens by defining a template for your config items:
 # revo recipe
 config:
   clonq/revo-config-ui:
-    template:
-      Webhook:
-        URL:
-        METHOD: GET POST
-        DESCRIPTION:
+    title: SETTINGS
+    components:
+    -
+      name: webbridge
+      label: Web Bridge
+      template:
+		INCOMING:
+          Path: 
+          Method: GET POST
+        OUTGOING:
+          URL:
+          Method: GET POST
 
 ```
 
