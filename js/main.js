@@ -1,12 +1,16 @@
 clonq_revo_config_ui = {
 	init: function(config){
-		//todo: figure out the race condition and remove setTimeout
-		setTimeout(function(){
+		document.addEventListener("revo:ready", function (e) {
+			// set title
 			$('#revo-config-ui .title').html(config.title);
 			config.components.forEach(function(component){
+				// todo: load existing settings
+				revo.emit({ action:'get', model:'config', data:component.name });
+				// component tab
 				var menuItem = $('<li role="presentation" class="active"><a href="#">'+component.label+'</a></li>');
 				$('#revo-config-ui .nav').append(menuItem);
 				var pageTags = generatePage(component.template);
+				// edit form
 				$('#revo-config-ui .settings').append(pageTags);
 				$('#revo-config-ui .add-btn').click(function(){
 					var sectionData = captureSectionData(component);
@@ -15,12 +19,11 @@ clonq_revo_config_ui = {
 					configData[component.name] = {};
 					configData[component.name][component.key] = sectionData
 					revo.emit({ action:'push', model:'config', data:configData });
-					//todo: populate list based on config.update.response data
+					//todo: populate list based on config.<component>.change data
 					$('.list').append(settingsEntry);
 				})
-
 			})
-		}, 100);
+		});
 	}
 }
 
@@ -48,6 +51,8 @@ function captureSectionData(config) {
 function generateListEntry(data) {
 	var ret = [];
 	var well = $('<div class="well"/>');
+	var deleteBtn = $('<button type="button" class="btn btn-danger" style="float:right">Remove</button>');
+	well.append(deleteBtn);
 	Object.keys(data).forEach(function(section){
 		var sectionEl = $('<blockquote/>');
 		var title = $(['<p>', section, '</p>'].join(''));
