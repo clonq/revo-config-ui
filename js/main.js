@@ -1,10 +1,30 @@
 clonq_revo_config_ui = {
 	init: function(config){
+		// register listeners
+		revo.registerCustomEventHandler('configuieventhandler', function(event, payload){
+			if(event === 'config:get.response') { // we might add more than one form / register for more than one event
+				if(!!payload && payload.component && payload.data) {
+					// populate existing settings
+					config.components.forEach(function(component){
+						if(component.name === payload.component) {
+							if(!!component.key) {
+								var settingsDataArray = payload.data[component.key];
+								settingsDataArray.forEach(function(settingsData){
+									console.log(settingsData)								
+									var settingsEntry = generateListEntry(settingsData);
+									$('.list').append(settingsEntry);
+								});
+							}
+						}
+					});
+				}
+			}
+		});
 		document.addEventListener("revo:ready", function (e) {
-			// set title
+			// set dom elements
 			$('#revo-config-ui .title').html(config.title);
 			config.components.forEach(function(component){
-				// todo: load existing settings
+				// request existing settings
 				revo.emit({ action:'get', model:'config', data:component.name });
 				// component tab
 				var menuItem = $('<li role="presentation" class="active"><a href="#">'+component.label+'</a></li>');
