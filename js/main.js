@@ -10,7 +10,7 @@ clonq_revo_config_ui = {
 							if(!!component.key) {
 								var settingsDataArray = payload.data[component.key];
 								settingsDataArray.forEach(function(settingsData){
-									var settingsEntry = generateListEntry(settingsData);
+									var settingsEntry = generateListEntry(component, settingsData);
 									$('.list').append(settingsEntry);
 								});
 							}
@@ -34,15 +34,15 @@ clonq_revo_config_ui = {
 				$('#revo-config-ui .settings').append(pageTags);
 				$('#revo-config-ui .add-btn').click(function(){
 					var sectionData = captureSectionData(component);
-					var settingsEntry = generateListEntry(sectionData);
+					var settingsEntry = generateListEntry(component, sectionData);
 					var configData = {};
 					configData[component.name] = {};
 					configData[component.name][component.key] = sectionData
 					revo.emit({ action:'push', model:'config', data:configData });
 					//todo: populate list based on config.<component>.change data
 					$('.list').append(settingsEntry);
-				})
-			})
+				});
+			});
 		});
 	}
 }
@@ -65,39 +65,57 @@ function captureSectionData(config) {
 			}
 		});
 	});
+	sectionData['$id'] = Date.now();
 	return sectionData;
 }
 
-function generateListEntry(data) {
+function generateListEntry(component, data) {
 	var ret = [];
 	var well = $('<div class="well"/>');
-	var deleteBtn = $('<button type="button" class="btn btn-danger" style="float:right">Remove</button>');
+	// var editBtn = $('<button type="button" class="btn edit-btn btn-primary" style="float:right;margin-left:1em;">Edit</button>');
+	// editBtn.prop('data-id', data['$id']);
+	// well.append(editBtn);
+	// editBtn.on('click', function(){
+	// });
+	var deleteBtn = $('<button type="button" class="btn remove-btn btn-danger" style="float:right;">Remove</button>');
+	deleteBtn.prop('data-id', data['$id']);
 	well.append(deleteBtn);
+	deleteBtn.on('click', function(){
+		revo.emit({ action:'delete', model:'config', data: {
+			component: component.name,
+			path: component.key,
+			condition: ['$id', 'eq', $(this).prop('data-id')].join(' ')
+		}});
+		//todo: remove element on config.change event
+		$(this).parent().remove();
+	});
 	Object.keys(data).forEach(function(section){
-		var sectionEl = $('<blockquote/>');
-		var title = $(['<p>', section, '</p>'].join(''));
-		sectionEl.append(title);
-		var footer = $('<footer/>');
-		var fields = Object.keys(data[section]);
-		fields.forEach(function(name){
-			var value = data[section][name];
-			var hasSubfields = !!value && (typeof(value) === 'object');
-			if(hasSubfields) {
-				var entry = $(['<div style="width:100%;overflow:hidden;white-space:nowrap;">', name, ': ', '</div>'].join(''));
-				footer.append(entry);
-				var subfields = Object.keys(value);
-				subfields.forEach(function(subfield){
-					var value = data[section][name][subfield];
-					var subentry = $(['<div style="width:100%;overflow:hidden;white-space:nowrap;">', '&nbsp;&nbsp;&nbsp;&nbsp;', subfield, ': ', JSON.stringify(value), '</div>'].join(''));
-					footer.append(subentry);
-				});
-			} else {
-				var entry = $(['<div style="width:100%;overflow:hidden;white-space:nowrap;">', name, ': ', JSON.stringify(value), '</div>'].join(''));
-				footer.append(entry);
-			}
-		});
-		sectionEl.append(footer);
-		well.append(sectionEl);
+		if(section.indexOf('$') < 0) {
+			var sectionEl = $('<blockquote/>');
+			var title = $(['<p>', section, '</p>'].join(''));
+			sectionEl.append(title);
+			var footer = $('<footer/>');
+			var fields = Object.keys(data[section]);
+			fields.forEach(function(name){
+				var value = data[section][name];
+				var hasSubfields = !!value && (typeof(value) === 'object');
+				if(hasSubfields) {
+					var entry = $(['<div style="width:100%;overflow:hidden;white-space:nowrap;">', name, ': ', '</div>'].join(''));
+					footer.append(entry);
+					var subfields = Object.keys(value);
+					subfields.forEach(function(subfield){
+						var value = data[section][name][subfield];
+						var subentry = $(['<div style="width:100%;overflow:hidden;white-space:nowrap;">', '&nbsp;&nbsp;&nbsp;&nbsp;', subfield, ': ', JSON.stringify(value), '</div>'].join(''));
+						footer.append(subentry);
+					});
+				} else {
+					var entry = $(['<div style="width:100%;overflow:hidden;white-space:nowrap;">', name, ': ', JSON.stringify(value), '</div>'].join(''));
+					footer.append(entry);
+				}
+			});
+			sectionEl.append(footer);
+			well.append(sectionEl);
+		}
 	});
 	ret.push(well);		
 	return ret;
