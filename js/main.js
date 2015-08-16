@@ -10,7 +10,6 @@ clonq_revo_config_ui = {
 							if(!!component.key) {
 								var settingsDataArray = payload.data[component.key];
 								settingsDataArray.forEach(function(settingsData){
-									console.log(settingsData)								
 									var settingsEntry = generateListEntry(settingsData);
 									$('.list').append(settingsEntry);
 								});
@@ -20,6 +19,7 @@ clonq_revo_config_ui = {
 				}
 			}
 		});
+		// page setup
 		document.addEventListener("revo:ready", function (e) {
 			// set dom elements
 			$('#revo-config-ui .title').html(config.title);
@@ -83,16 +83,16 @@ function generateListEntry(data) {
 			var value = data[section][name];
 			var hasSubfields = !!value && (typeof(value) === 'object');
 			if(hasSubfields) {
-				var entry = $(['<div>', name, ': ', '</div>'].join(''));
+				var entry = $(['<div style="width:100%;overflow:hidden;white-space:nowrap;">', name, ': ', '</div>'].join(''));
 				footer.append(entry);
 				var subfields = Object.keys(value);
 				subfields.forEach(function(subfield){
 					var value = data[section][name][subfield];
-					var subentry = $(['<div>', '&nbsp;&nbsp;&nbsp;&nbsp;', subfield, ': ', value, '</div>'].join(''));
+					var subentry = $(['<div style="width:100%;overflow:hidden;white-space:nowrap;">', '&nbsp;&nbsp;&nbsp;&nbsp;', subfield, ': ', JSON.stringify(value), '</div>'].join(''));
 					footer.append(subentry);
 				});
 			} else {
-				var entry = $(['<div>', name, ': ', value, '</div>'].join(''));
+				var entry = $(['<div style="width:100%;overflow:hidden;white-space:nowrap;">', name, ': ', JSON.stringify(value), '</div>'].join(''));
 				footer.append(entry);
 			}
 		});
